@@ -4,8 +4,15 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+// Check that the Stripe secret key exists
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error("Stripe secret key is missing in environment variables");
+}
+
+// Initialize Stripe with API version
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2022-11-15",
+});
 
 // Initialize Razorpay
 const razorpay = new Razorpay({
@@ -41,7 +48,6 @@ export const initiatePayment = async (booking, paymentMethodId, gateway = "strip
         status: paymentIntent.status,
         message: "Payment initiated successfully (Stripe)",
       };
-
     } else if (gateway === "razorpay") {
       // ============== RAZORPAY FLOW ==============
       // Create an order in Razorpay
@@ -59,7 +65,6 @@ export const initiatePayment = async (booking, paymentMethodId, gateway = "strip
         status: "created",
         message: "Payment initiated successfully (Razorpay)",
       };
-
     } else {
       // Unsupported gateway
       return {
@@ -78,8 +83,8 @@ export const initiatePayment = async (booking, paymentMethodId, gateway = "strip
 
 /**
  * Process Payment
- * (In Stripe's case, this might just call `initiatePayment` again,
- *  but for Razorpay you usually confirm on the frontend and verify on the backend.)
+ * (For Stripe, this might just call `initiatePayment` again,
+ * but for Razorpay you usually confirm on the frontend and verify on the backend.)
  * @param {Object} booking
  * @param {string} paymentMethodId - For Stripe
  * @param {string} [gateway='stripe']
@@ -106,9 +111,7 @@ export const checkPaymentStatus = async (paymentId, gateway = "stripe") => {
       };
     } else if (gateway === "razorpay") {
       // ============== RAZORPAY FLOW ==============
-      // For Razorpay, you can fetch payment details using razorpay.payments.fetch
-      // But that requires a "paymentId" (like pay_XXXX).
-      // If you only have orderId, you'd need to list payments for that order.
+      // For Razorpay, fetch payment details using razorpay.payments.fetch.
       const payment = await razorpay.payments.fetch(paymentId);
       return {
         success: true,
@@ -149,8 +152,7 @@ export const processRefund = async (paymentId, refundAmount, gateway = "stripe")
       };
     } else if (gateway === "razorpay") {
       // ============== RAZORPAY REFUND ==============
-      // In Razorpay, you typically refund a "paymentId" (pay_xxx).
-      // If you only have an order ID, you'd need to find the payment ID first.
+      // In Razorpay, you typically refund a "paymentId" (e.g., pay_xxx).
       const refund = await razorpay.payments.refund(paymentId, {
         amount: refundAmount ? refundAmount * 100 : undefined, // in paise
       });
