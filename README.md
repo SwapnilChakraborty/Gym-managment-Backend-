@@ -1,19 +1,26 @@
-# Gym Management Backend
+## 📌 Endpoints
 
-This is the backend for the Gym Management SaaS project built with Node.js, Express, and MongoDB.
+### 🏋️ Gym Management
+- `GET /gyms` - Fetch all gyms
+- `POST /gyms` - Add a new gym
 
-## Features
+### 📅 Booking
+- `POST /booking` - Book a slot
+- `GET /booking/:id` - Get booking details
 
-- User authentication (register & login) using JWT
-- Role-based access control (admin, franchise, user)
-- Gym management (add gym, view gyms)
-- Slot booking system (book & approve bookings)
-- Payment processing using Stripe
-- Email notifications using NodeMailer
+### 💳 Payments
+- `POST /payment/initiate` - Initiate a payment
+- `GET /payment/status/:paymentId` - Check payment status
 
-## Setup
+### 🔔 Notifications
+- `GET /notifications` - Fetch user notifications
+- `WebSocket: ws://yourserver/bookings-updates` - Real-time booking updates
 
-1. Clone the repository.
-2. Run `npm install` to install dependencies.
-3. Create a `.env` file in the root of the backend with the following variables:
+## 🔗 How to Connect
+Frontend developers can make API requests using:
+- `fetch()` in JavaScript
+- `Axios` for React/Next.js
+- `Postman` for testing
 
+## 📡 WebSocket Integration
+For real-time updates, connect to:

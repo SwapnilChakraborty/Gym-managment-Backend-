@@ -6,6 +6,8 @@ import cookieParser from "cookie-parser";
 import http from "http";
 import { Server } from "socket.io";
 import morgan from "morgan";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 
 // Route Files
 import authRoutes from "./routes/authRoutes.js";
@@ -32,7 +34,15 @@ const io = new Server(server, {
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
-app.use(morgan("dev")); // ✅ Logs requests in a structured way
+app.use(morgan("dev"));
+app.use(helmet());
+
+// Rate Limiting Middleware
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+});
+app.use(limiter);
 
 // CORS Configuration
 const allowedOrigins = ["http://localhost:3000", "https://yourdomain.com"];
@@ -100,7 +110,9 @@ const startServer = async () => {
     await connectDB();
     console.log("✅ Database Connected");
 
-    server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+    server.listen(PORT, () =>
+      console.log(`🚀 Server running on port ${PORT}`)
+    );
   } catch (error) {
     console.error("❌ Database connection failed:", error);
     process.exit(1);
@@ -108,12 +120,15 @@ const startServer = async () => {
 };
 
 // Graceful Shutdown Handling
-process.on("SIGINT", () => {
+const shutdown = () => {
   console.log("🔻 Server shutting down...");
   server.close(() => {
     console.log("🔴 HTTP server closed");
     process.exit(0);
   });
-});
+};
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
 
 startServer();
