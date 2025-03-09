@@ -13,8 +13,8 @@ import rateLimit from "express-rate-limit";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import gymRoutes from "./routes/gymRoutes.js";
-import bookingRoutes from "./routes/bookingRoutes.js";
-import paymentRoutes from "./routes/paymentRoutes.js";
+// import bookingRoutes from "./routes/bookingRoutes.js";
+// import paymentRoutes from "./routes/paymentRoutes.js";
 import mapRoutes from "./routes/mapRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 
@@ -86,8 +86,8 @@ io.on("connection", (socket) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/gym", gymRoutes);
-app.use("/api/booking", bookingRoutes);
-app.use("/api/payment", paymentRoutes);
+// app.use("/api/booking", bookingRoutes);
+// app.use("/api/payment", paymentRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/maps", mapRoutes);
 
